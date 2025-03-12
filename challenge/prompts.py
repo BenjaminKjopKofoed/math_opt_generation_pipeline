@@ -1,8 +1,7 @@
 from langchain_core.prompts import PromptTemplate
 
 prompts = {
-
-    "code_prompt": '''You are an expert in Operations Research, Python programming language, and the PuLP library. 
+    "code_prompt": """You are an expert in Operations Research, Python programming language, and the PuLP library. 
 You are also proficient in JSON file format. 
 I will provide you a description of an optimization problem in natural language and I need you to write a Python script using PuLP to solve that specific problem instance and find the optimal solution. 
 Don't write anything before and after the code, it will be simple for me to parse your answer.
@@ -24,9 +23,8 @@ Guidelines:
    - For tiered constraints (e.g., different values or costs at different levels), ensure correct implementation.
    - Pay attention to special conditions like non-overlapping categories, specific setups, or unique constraints.
 6. Solve the problem with `problem.solve(PULP_CBC_CMD(msg=0))` to suppress the solver's log.
-7. Format the output as a JSON string with the required answers, ensuring all specified outputs in the test_results are addressed.''',
-
-    "code_prompt_static_example": '''You are an expert in Operations Research, Python programming language, PuLP library and JSON file format. 
+7. Format the output as a JSON string with the required answers, ensuring all specified outputs in the test_results are addressed.""",
+    "code_prompt_static_example": """You are an expert in Operations Research, Python programming language, PuLP library and JSON file format. 
 I will give you a description in natural language of an optimization problem and you just have to write a Python script using PuLP to solve that specific instance 
 of the problem. Don't write anything before and after the code, it will be simple for me to parse your answer. The code must only print a single string to stdout, formatted in JSON, which contains the 
 answers to the question I will give you in input (be sure to insert all the results into the JSON output).
@@ -84,9 +82,8 @@ Question to answer:
 Be careful: if there are strict inequality constraints such as x>y then use x>= y +1 for integer and binary variables, use x>= 1e-4 for continuous variables instead.
 Please remember to solve the problem with status = problem.solve(PULP_CBC_CMD(msg=0)) in order to suppress solver's log.
 If your problem needs you to decide whether to activate some resources that has fixed costs, evaluate the opportunity to add some other variable to model this condition.
-In the output all the results value must be printed as strings and all binary variables must be set to True or False (not 1 and 0 or true and false lower case).''',
-
-    "code_prompt_similarity": '''You are an expert in Operations Research, Python programming language, PuLP library and JSON file format. 
+In the output all the results value must be printed as strings and all binary variables must be set to True or False (not 1 and 0 or true and false lower case).""",
+    "code_prompt_similarity": """You are an expert in Operations Research, Python programming language, PuLP library and JSON file format. 
 I will give you a description in natural language of an optimization problem and you just have to write a Python script using PuLP to solve that specific instance 
 of the problem. Don't write anything before and after the code, it will be simple for me to parse your answer. The code must only print a single string to stdout, formatted in JSON, which contains the 
 answers to the question I will give you in input (be sure to insert all the results into the JSON output).
@@ -111,8 +108,7 @@ Question to answer:
 Be careful: if there are strict inequality constraints such as x>y then use x>= y +1 for integer and binary variables, use x>= 1e-4 for continuous variables instead.
 Please remember to solve the problem with status = problem.solve(PULP_CBC_CMD(msg=0)) in order to suppress solver's log.
 If your problem needs you to decide whether to activate some resources that has fixed costs, evaluate the opportunity to add some other variable to model this condition.
-In the output all the results value must be printed as strings and all binary variables must be set to True or False (not 1 and 0 or true and false lower case).''',
-
+In the output all the results value must be printed as strings and all binary variables must be set to True or False (not 1 and 0 or true and false lower case).""",
     "feedback_prompt": """
 I have a code that gives me the following error:
 
@@ -129,8 +125,7 @@ Code (Input 2): {code}
 I need you to correct it without writing anything else but the code.
 Don't write anything before and after the code, it will be simpler for me to parse your answer. 
 Don't change neither a word in the final prints as they are the results I'm interested in.""",
-
-    "check_optimal_solution_prompt": '''You are an expert in Operations Research, Python programming language and you are also proficient in JSON file format. 
+    "check_optimal_solution_prompt": """You are an expert in Operations Research, Python programming language and you are also proficient in JSON file format. 
 I have the description of an optimization problem and a set of different solutions, and I need you to establish which solution is the best one.
 Please also verify the feasibility of every constraint taking into account also the nature of the variables (continuous, integer or binary) and discard the infeasible solutions.
 
@@ -142,10 +137,9 @@ Here is the set of different solutions:
 
 {solutions}
 
-Note: For constraints involving multiplicative relationships with zero, assume any non-negative number satisfies the constraint when the multiplier is zero.''',
-
+Note: For constraints involving multiplicative relationships with zero, assume any non-negative number satisfies the constraint when the multiplier is zero.""",
     "get_optimal_solution_prompt": """Hi, I have an optimization problem and a set of different solutions and I asked chat gpt which is the best one, provided the problem description.
-Now, I will provide you gpt's answer (that already estabished which solution is the best one) and I need you to provide to me only the best solution without writing anything else.
+Now, I will provide you gpt's answer (that already established which solution is the best one) and I need you to provide to me only the best solution without writing anything else.
 
 Here is the set of different solutions:
 
@@ -156,68 +150,99 @@ Here is the gpt's answer: (beginning of gpt's answer)
 {gpt_answer}
 (end of gpt's answer)
 
-Please write only the optimal solution determined by gpt (in the original format) in JSON format inside a JSON Markdown block. Remember that the JSON format requires double quotes to enclose keys and values"""
-
+Please write only the optimal solution determined by gpt (in the original format) in JSON format inside a JSON Markdown block. Remember that the JSON format requires double quotes to enclose keys and values""",
 }
+
 
 def get_code_prompt(test_question: str, test_results: str) -> (PromptTemplate, dict):
 
-    data = {
-        "test_question": test_question,
-        "test_results": test_results
-    }
+    data = {"test_question": test_question, "test_results": test_results}
 
-    return PromptTemplate(template=prompts['code_prompt'], input_variables=list(data.keys())), data
-
-
-def get_code_prompt_static_example(test_question: str, test_results: str) -> (PromptTemplate, dict):
-
-    data = {
-        "test_question": test_question,
-        "test_results": test_results
-    }
-
-    return PromptTemplate(template=prompts['code_prompt_static_example'], input_variables=list(data.keys())), data
+    return (
+        PromptTemplate(
+            template=prompts["code_prompt"], input_variables=list(data.keys())
+        ),
+        data,
+    )
 
 
-def get_code_prompt_similarity(train_question: str, train_results: str, train_code: str, test_question: str, test_results: str) -> (PromptTemplate, dict):
+def get_code_prompt_static_example(
+    test_question: str, test_results: str
+) -> (PromptTemplate, dict):
+
+    data = {"test_question": test_question, "test_results": test_results}
+
+    return (
+        PromptTemplate(
+            template=prompts["code_prompt_static_example"],
+            input_variables=list(data.keys()),
+        ),
+        data,
+    )
+
+
+def get_code_prompt_similarity(
+    train_question: str,
+    train_results: str,
+    train_code: str,
+    test_question: str,
+    test_results: str,
+) -> (PromptTemplate, dict):
 
     data = {
         "train_question": train_question,
         "train_results": train_results,
         "train_code": train_code,
         "test_question": test_question,
-        "test_results": test_results
+        "test_results": test_results,
     }
 
-    return PromptTemplate(template=prompts['code_prompt_similarity'], input_variables=list(data.keys())), data
+    return (
+        PromptTemplate(
+            template=prompts["code_prompt_similarity"],
+            input_variables=list(data.keys()),
+        ),
+        data,
+    )
 
 
 def get_feedback_prompt(code: str, stderr: str) -> (PromptTemplate, dict):
 
-    data = {
-        "code": code,
-        "stderr": stderr
-    }
+    data = {"code": code, "stderr": stderr}
 
-    return PromptTemplate(template=prompts['feedback_prompt'], input_variables=list(data.keys())), data
-
-
-def get_check_optimal_solution_prompt(test_question: str, solutions: list[dict]) -> (PromptTemplate, dict):
-
-    data = {
-        "test_question": test_question,
-        "solutions": solutions
-    }
-
-    return PromptTemplate(template=prompts['check_optimal_solution_prompt'], input_variables=list(data.keys())), data
+    return (
+        PromptTemplate(
+            template=prompts["feedback_prompt"], input_variables=list(data.keys())
+        ),
+        data,
+    )
 
 
-def get_get_optimal_solution_prompt(solutions: list[dict], gpt_answer: str) -> (PromptTemplate, dict):
+def get_check_optimal_solution_prompt(
+    test_question: str, solutions: list[dict]
+) -> (PromptTemplate, dict):
 
-    data = {
-        "solutions": solutions,
-        "gpt_answer": gpt_answer
-    }
+    data = {"test_question": test_question, "solutions": solutions}
 
-    return PromptTemplate(template=prompts['get_optimal_solution_prompt'], input_variables=list(data.keys())), data
+    return (
+        PromptTemplate(
+            template=prompts["check_optimal_solution_prompt"],
+            input_variables=list(data.keys()),
+        ),
+        data,
+    )
+
+
+def get_get_optimal_solution_prompt(
+    solutions: list[dict], gpt_answer: str
+) -> (PromptTemplate, dict):
+
+    data = {"solutions": solutions, "gpt_answer": gpt_answer}
+
+    return (
+        PromptTemplate(
+            template=prompts["get_optimal_solution_prompt"],
+            input_variables=list(data.keys()),
+        ),
+        data,
+    )
